@@ -7,6 +7,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.Window;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class HUD_Display extends Activity
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
+        this.requestWindowFeature( Window.FEATURE_NO_TITLE );
         setContentView( R.layout.activity_hud );
 
         this.draw_all = new DrawAll( this );
@@ -39,8 +41,8 @@ public class HUD_Display extends Activity
 
     private void process_plot(  )
     {
-        data_map.put( "IAS", 5.f );
-        data_map.put( "ALT", 10.f );
+        data_map.put( "IAS", 120.f );
+        data_map.put( "ALT", 7500.f );
         draw_all.plot( data_map );
     }
 

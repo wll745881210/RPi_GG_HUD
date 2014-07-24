@@ -86,31 +86,34 @@ public class DrawAttitude
               float width )
     {
         paint.setStrokeWidth( width );
-        float cos_phi = ( float ) Math.cos( - phi * deg_to_rad  );
-        float sin_phi = ( float ) Math.sin( - phi * deg_to_rad  );
+        float cos_phi = ( float ) Math.cos( -phi * deg_to_rad  );
+        float sin_phi = ( float ) Math.sin( -phi * deg_to_rad  );
         float x_in    = x_center - r_in  * sin_phi;
         float y_in    = y_center - r_in  * cos_phi;
         float x_out   = x_center - r_out * sin_phi;
         float y_out   = y_center - r_out * cos_phi;
-        canvas.drawLine( x_in, y_in, x_out, y_out, paint);
+        canvas.drawLine( x_in, y_in, x_out, y_out, paint );
     }
 
     private void plot_bank(  )
     {
-        final float w_frame       = 2.0f;
         final float w_indicator   = 6.0f;
         float r_in  = main_line_length * 1.12f;
-        float r_out = main_line_length * 1.20f;
+        float r_out = main_line_length * 1.30f;
         float phi_arr[]
-                = { 90.f, 60.f, 45.f, 30.f, 20.f, 10.f, 0.f };
-        for( float phi : phi_arr )
+                = { 60.f, 45.f, 30.f, 20.f, 10.f, 0.f };
+        float w_arr[]
+                = {  3.f,  4.f,  3.f,  1.f,  1.f, 5.f };
+        for( int i = 0; i < phi_arr.length; ++ i )
         {
-            plot_bank_frame_single(  phi, r_in, r_out, w_frame );
-            plot_bank_frame_single( -phi, r_in, r_out, w_frame );
+            float phi = phi_arr[ i ];
+            float w   = w_arr  [ i ];
+            plot_bank_frame_single(  phi, r_in, r_out, w );
+            plot_bank_frame_single( -phi, r_in, r_out, w );
         }
 
         r_in  = main_line_length * 1.05f;
-        r_out = main_line_length * 1.16f;
+        r_out = main_line_length * 1.21f;
         plot_bank_frame_single( bank, r_in, r_out, w_indicator );
     }
 
@@ -128,8 +131,8 @@ public class DrawAttitude
         canvas_width  = canvas.getWidth(  );
         canvas_height = canvas.getHeight(  );
         x_center = canvas_width  / 2;
-        y_center = canvas_height / 2;
-        main_line_length = canvas_width * 0.18f;
+        y_center = canvas_height / 2 * 0.9f;
+        main_line_length = canvas_width * 0.2f;
 
         canvas.save();
         plot_region_path.reset();

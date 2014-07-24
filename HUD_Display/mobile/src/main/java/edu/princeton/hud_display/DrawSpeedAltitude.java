@@ -130,7 +130,7 @@ public class DrawSpeedAltitude
         this.canvas = canvas;
         canvas_width  = canvas.getWidth(  );
         canvas_height = canvas.getHeight(  );
-        frame_height    = canvas_height * 0.4f;
+        frame_height    = canvas_height * 0.35f;
         frame_width     = canvas_width  * 0.1f;
         dx_frame_center = canvas_width  * 0.35f;
         x_center = canvas_width  / 2;

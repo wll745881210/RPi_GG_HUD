@@ -27,12 +27,14 @@ public class DrawAll extends SurfaceView
     private SurfaceHolder holder;
     private DrawAttitude draw_attitude;
     private DrawSpeedAltitude draw_speed_altitude;
+    private DrawHDG draw_hdg;
     @Override
     public void surfaceCreated( SurfaceHolder holder )
     {
         this.holder = holder;
         draw_attitude       = new DrawAttitude( holder );
         draw_speed_altitude = new DrawSpeedAltitude( holder );
+        draw_hdg            = new DrawHDG( holder );
     }
 
     @Override
@@ -64,6 +66,9 @@ public class DrawAll extends SurfaceView
         draw_speed_altitude.set_speed_altitude
                 ( data.get( "IAS" ), data.get( "ALT" ) );
         draw_speed_altitude.draw_speed_altitude( canvas, paint );
+
+        draw_hdg.set_hdg( data.get( "HDG" ) );
+        draw_hdg.draw_hdg( canvas, paint );
 
         holder.unlockCanvasAndPost( canvas );
     }
