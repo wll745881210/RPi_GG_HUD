@@ -134,7 +134,7 @@ public class DrawSpeedAltitude
         frame_width     = canvas_width  * 0.1f;
         dx_frame_center = canvas_width  * 0.35f;
         x_center = canvas_width  / 2;
-        y_center = canvas_height / 2;
+        y_center = canvas_height / 2 * 0.9f;
         this.paint = paint;
 
         plot_frame();

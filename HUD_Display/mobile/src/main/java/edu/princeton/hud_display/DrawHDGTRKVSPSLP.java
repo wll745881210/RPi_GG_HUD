@@ -87,7 +87,7 @@ public class DrawHDGTRKVSPSLP
         {
             int rule_value = d_value *
                     ( center_value / d_value + i );
-            float dx = -spacing_const * ( rule_value - center_value );
+            float dx = spacing_const * ( rule_value - center_value );
             boolean is_tick = rule_value % ( d_value * dn_tick ) == 0
                     ? true : false;
 
