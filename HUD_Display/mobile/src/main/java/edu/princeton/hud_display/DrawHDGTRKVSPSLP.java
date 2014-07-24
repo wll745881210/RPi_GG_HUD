@@ -4,18 +4,23 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.SurfaceHolder;
 
-public class DrawHDG
+public class DrawHDGTRKVSPSLP
 {
     private SurfaceHolder holder;
-    public DrawHDG(SurfaceHolder holder)
+    public DrawHDGTRKVSPSLP(SurfaceHolder holder)
     {
         this.holder = holder;
     }
 
-    private float hdg;
-    public void set_hdg( float hdg )
+    private int hdg, trk, vsp;
+    private float slp;
+    public void set_hdg_trk_vsp_slp
+            ( float hdg, float trk, float vsp, float slp )
     {
-        this.hdg = hdg;
+        this.hdg = ( int ) hdg;
+        this.trk = ( int ) trk;
+        this.vsp = ( int ) vsp;
+        this.slp =         slp;
     }
 
     private void plot_frame(  )
@@ -25,6 +30,25 @@ public class DrawHDG
         canvas.drawLine( x_center, y_base,
                 x_center, y_base - 1.2f * frame_height,
                 paint );
+
+
+        paint.setTextAlign( Paint.Align.RIGHT );
+        String trk_str = String.format( "TRK %03d", trk );
+        canvas.drawText( trk_str,
+                x_center - frame_width - 10, y_base, paint );
+
+        paint.setTextAlign( Paint.Align.LEFT );
+        String vsp_str = String.format( "V/S  %d", vsp );
+        if( vsp > 0 )
+            vsp_str = "+" + vsp_str;
+        canvas.drawText( vsp_str, x_center + frame_width + 10,
+                y_base, paint );
+
+        y_base = y_center - dy_frame_center + 20;
+        paint.setTextAlign( Paint.Align.LEFT );
+        String slp_str = String.format( "ALTI %02.2f", slp );
+        canvas.drawText( slp_str,
+                x_center + frame_width + 10, y_base, paint );
     }
 
     private float frame_height, frame_width;
@@ -46,7 +70,8 @@ public class DrawHDG
         if( tick )
         {
             paint.setTextAlign( Paint.Align.CENTER );
-            canvas.drawText( Integer.toString( value ),
+            String tick_str = String.format( "%03d", value );
+            canvas.drawText( tick_str,
                     x_center + dx, y_base - y_ext, paint );
         }
     }
@@ -85,7 +110,7 @@ public class DrawHDG
         canvas_width  = canvas.getWidth(  );
         canvas_height = canvas.getHeight(  );
         frame_height    = canvas_height * 0.07f;
-        frame_width     = canvas_width  * 0.25f;
+        frame_width     = canvas_width  * 0.22f;
         dy_frame_center = canvas_height * 0.5f;
         x_center = canvas_width  / 2;
         y_center = canvas_height / 2;

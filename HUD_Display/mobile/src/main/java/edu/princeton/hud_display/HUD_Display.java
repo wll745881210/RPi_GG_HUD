@@ -43,6 +43,9 @@ public class HUD_Display extends Activity
     {
         data_map.put( "IAS", 120.f );
         data_map.put( "ALT", 7500.f );
+        data_map.put( "TRK", 250f );
+        data_map.put( "SLP", 29.92f );
+        data_map.put( "VSP", -1200f );
         draw_all.plot( data_map );
     }
 

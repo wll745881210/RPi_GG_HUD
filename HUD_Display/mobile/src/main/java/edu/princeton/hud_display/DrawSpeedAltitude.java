@@ -23,7 +23,7 @@ public class DrawSpeedAltitude
     private float dx_frame_center;
     private void plot_frame(  )
     {
-        paint.setStrokeWidth( 2.0f );
+        paint.setStrokeWidth( 4.0f );
         canvas.drawLine( x_center - dx_frame_center,
                 y_center - frame_height,
                 x_center - dx_frame_center,
@@ -58,10 +58,10 @@ public class DrawSpeedAltitude
                 paint );
 
         canvas.drawLine( x_center + dx_frame_center, y_center,
-                x_center + dx_frame_center - 30, y_center,
+                x_center + dx_frame_center - 60, y_center,
                 paint );
         canvas.drawLine( x_center - dx_frame_center, y_center,
-                x_center - dx_frame_center + 30, y_center,
+                x_center - dx_frame_center + 60, y_center,
                 paint );
     }
 
