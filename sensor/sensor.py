@@ -168,7 +168,7 @@ class sensor ( Thread ):
         b   = Rtheta * Rphi * b;
         bx  = b[ 0, 0 ];
         by  = b[ 1, 0 ];
-        hdg = -arctan2( by, bx );
+        hdg = arctan2( by, bx );
         if hdg < 0:
             hdg += 2 * pi;
         #
