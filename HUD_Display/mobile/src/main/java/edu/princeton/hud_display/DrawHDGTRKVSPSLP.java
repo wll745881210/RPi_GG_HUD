@@ -32,23 +32,23 @@ public class DrawHDGTRKVSPSLP
                 paint );
 
 
-        paint.setTextAlign( Paint.Align.RIGHT );
-        String trk_str = String.format( "TRK %03d", trk );
-        canvas.drawText( trk_str,
-                x_center - frame_width - 10, y_base, paint );
-
         paint.setTextAlign( Paint.Align.LEFT );
+        String trk_str = String.format( "TRK %03d", trk );
+        canvas.drawText( trk_str, 10,
+                y_base, paint );
+
+        paint.setTextAlign( Paint.Align.RIGHT );
         String vsp_str = String.format( "V/S  %d", vsp );
         if( vsp > 0 )
             vsp_str = "+" + vsp_str;
-        canvas.drawText( vsp_str, x_center + frame_width + 10,
+        canvas.drawText( vsp_str, canvas_width - 10,
                 y_base, paint );
 
         y_base = y_center - dy_frame_center + 20;
-        paint.setTextAlign( Paint.Align.LEFT );
+        paint.setTextAlign( Paint.Align.RIGHT );
         String slp_str = String.format( "ALTI %02.2f", slp );
-        canvas.drawText( slp_str,
-                x_center + frame_width + 10, y_base, paint );
+        canvas.drawText( slp_str, canvas_width - 10,
+                y_base, paint );
     }
 
     private float frame_height, frame_width;

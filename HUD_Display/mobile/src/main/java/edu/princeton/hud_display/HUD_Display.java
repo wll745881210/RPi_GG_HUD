@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Window;
@@ -36,16 +39,66 @@ public class HUD_Display extends Activity
         bluetooth_recv.start();
     }
 
+    private static final int menu_toggle_gps_alt =
+            Menu.FIRST;
+    private static final int menu_set_alti =
+            Menu.FIRST + 1;
+    public boolean onCreateOptionsMenu( Menu menu )
+    {
+        super.onCreateOptionsMenu( menu );
+        menu.add( 0, menu_toggle_gps_alt, 0,
+                "Toggle GPS Alti" );
+        menu.add( 0, menu_set_alti, 0,
+                "Set Altimeter" );
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected( MenuItem item )
+    {
+        super.onOptionsItemSelected( item );
+        switch( item.getItemId(  ) )
+        {
+            case menu_toggle_gps_alt:
+                data_process.toggle_gps_alti(  );
+                break;
+            case menu_set_alti:
+                data_process.set_sea_level_pressue( 29.92f );
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if( keyCode == KeyEvent.KEYCODE_DPAD_CENTER )
+        {
+            openOptionsMenu();
+            return true;
+        }
+        else if( keyCode == KeyEvent.KEYCODE_BACK )
+        {
+            finish();
+        }
+        return false;
+    }
+
+
     private Map<String, Float> data_map
             = new HashMap<String, Float>(  );
-
+    private DataProcess data_process
+            = new DataProcess(  );
     private void process_plot(  )
     {
         data_map.put( "IAS", 120.f );
         data_map.put( "ALT", 7500.f );
         data_map.put( "TRK", 250f );
         data_map.put( "SLP", 29.92f );
-        data_map.put( "VSP", -1200f );
+        data_map.put( "VSP", 1200f );
+        data_map.put( "BAR", 1013.f );
+        data_map.put( "PIT", 7f );
+        data_map.put( "BAN", -8f );
         draw_all.plot( data_map );
     }
 
