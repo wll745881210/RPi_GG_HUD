@@ -1,14 +1,16 @@
 package edu.princeton.hud_display;
 
 import android.graphics.Canvas;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.view.SurfaceHolder;
 import java.lang.Math;
 
 public class DrawAttitude
 {
     private SurfaceHolder holder;
+
+    Path plot_region_path = new Path();
     public DrawAttitude( SurfaceHolder holder )
     {
         this.holder = holder;
@@ -85,15 +87,25 @@ public class DrawAttitude
     private float canvas_width, canvas_height;
     private float x_center, y_center;
     private float main_line_length;
+
     public void draw_attitude( Canvas canvas, Paint paint )
     {
         this.canvas = canvas;
+        this.paint  = paint;
+
         canvas_width  = canvas.getWidth(  );
         canvas_height = canvas.getHeight(  );
         x_center = canvas_width  / 2;
         y_center = canvas_height / 2;
         main_line_length = canvas_width * 0.21f;
-        this.paint  = paint;
+
+        canvas.save();
+        plot_region_path.reset();
+        plot_region_path.addCircle
+                ( x_center, y_center, main_line_length,
+                        Path.Direction.CCW );
+        canvas.clipPath( plot_region_path );
+
         plot_main_line();
         for( int i = -90; i <= 90; i += 5 )
         {
@@ -101,5 +113,8 @@ public class DrawAttitude
                 continue;
             plot_single_aux_line( ( float ) i );
         }
+
+
+        canvas.restore();
     }
 }

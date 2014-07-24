@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
+import java.util.Map;
 
 public class DrawAll extends SurfaceView
         implements SurfaceHolder.Callback
@@ -50,17 +51,18 @@ public class DrawAll extends SurfaceView
         int scale = 2;
         paint.setTextSize( original_text_size * scale );
 
-        if( Math.abs( bank_angle ) > 45 ||
-                Math.abs( pitch_angle ) > 30 )
+        if( Math.abs( data.get( "BAN" ) ) > 45 ||
+                Math.abs( data.get( "PIT" )  ) > 30 )
             paint.setColor( Color.RED );
         else
             paint.setColor( Color.GREEN );
 
-        draw_attitude.set_angles( data.get( "BAN" ),
-                data.get( "PIT" ) );
+        draw_attitude.set_angles
+                ( data.get( "BAN" ), data.get( "PIT" ) );
         draw_attitude.draw_attitude( canvas, paint );
 
-        draw_speed_altitude.set_speed_altitude( kias, altitude );
+        draw_speed_altitude.set_speed_altitude
+                ( data.get( "IAS" ), data.get( "ALT" ) );
         draw_speed_altitude.draw_speed_altitude( canvas, paint );
 
         holder.unlockCanvasAndPost( canvas );

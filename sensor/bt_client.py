@@ -41,9 +41,7 @@ try:
             continue;
         #
         s.get_val(  );
-        report = f_report\
-                 ( s.pitch, s.bank, s.kias, s.altitude,
-                   s.vs, s.hdg, s.trk, s.gs );
+        report = s.report()
         print report;
         sock.send( report );
     #

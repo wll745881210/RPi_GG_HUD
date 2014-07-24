@@ -39,6 +39,8 @@ public class HUD_Display extends Activity
 
     private void process_plot(  )
     {
+        data_map.put( "IAS", 5.f );
+        data_map.put( "ALT", 10.f );
         draw_all.plot( data_map );
     }
 
@@ -73,8 +75,8 @@ public class HUD_Display extends Activity
             {
                 String[ ] sub_arr = s_sub.split( ":" );
                 String key = sub_arr[ 0 ];
-                if( key.equals( "AUG" ) || key.equals( "UAG" ) ) // start or end
-                    continue;
+                if( key.equals( "AUG" ) || key.equals( "UAG" ) )
+                    continue;  // start or end
 
                 float val;
                 try
@@ -90,6 +92,4 @@ public class HUD_Display extends Activity
 
         }
     };
-
-
 }

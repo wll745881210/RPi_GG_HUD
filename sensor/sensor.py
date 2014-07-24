@@ -37,7 +37,7 @@ class sensor ( Thread ):
         self.g      = zeros( 3 ); # Grav vector
         self.kalman = [ kalman( ) for _ in range( 3 ) ];
         #################
-        self.d_gravity_threashold = 0.05;
+        self.d_gravity_threashold = 0.02;
         # In case that the deviation of the magnitude
         # of acceleration vector is greater than this,
         # the data from acclerometer will not
@@ -113,58 +113,6 @@ class sensor ( Thread ):
         return;
     #
 
-    #######################################################
-    # Quaternion method. Unused for now.
-    ####################################
-    # def gyro_dq( self ):
-    #     gyr_x, gyr_y, gyr_z = self.gyr.get_gyr(  );
-    #     t         =   matrix( zeros( ( 4, 4 ) ) );
-    #     t[ 0, 1 ] =   gyr_x;
-    #     t[ 0, 2 ] =   gyr_y;
-    #     t[ 0, 3 ] =   gyr_z;
-    #     t[ 1, 2 ] = - gyr_z;
-    #     t[ 1, 3 ] = - gyr_y;
-    #     t[ 2, 3 ] = - gyr_x;
-    #     t         = ( t - t.T ) * self.deg_to_rad;
-    #     dq = -0.5 * t * matrix( self.q ).T;
-    #     return array( dq ).flatten(  );
-    # #
-    # def euler_to_quater( self, phi, theta, psy ):
-    #     cphi = cos( phi   / 2 );
-    #     sphi = sin( phi   / 2 );
-    #     cthe = cos( theta / 2 );
-    #     sthe = sin( theta / 2 );
-    #     cpsy = cos( psy   / 2 );
-    #     spsy = sin( psy   / 2 );
-    #     q = zeros( 4 );
-    #     q[ 0 ] = cphi * cthe * cpsy + sphi * sthe * spsy;
-    #     q[ 1 ] = sphi * cthe * cpsy - cphi * sthe * spsy;
-    #     q[ 2 ] = cphi * sthe * cpsy + sphi * cthe * spsy;
-    #     q[ 3 ] = cphi * cthe * spsy - sphi * sthe * cpsy;
-    #     return q;
-    # #
-    # def quater_to_euler( self, q ):
-    #     a     = q[ 0 ];
-    #     b     = q[ 1 ];
-    #     c     = q[ 2 ];
-    #     d     = q[ 3 ];
-    #     theta = - arcsin( 2 * ( b * d - a * c ) );
-    #     if   abs( theta - pi / 2 ) < 1e-4:
-    #         phi =  0.;
-    #         psy =  2 * arctan2( b / a );
-    #     elif abs( theta + pi / 2 ) < 1e-4:
-    #         phi =  0.;
-    #         psy = -2 * arctan2( b / a );
-    #     else:
-    #         phi = arctan2( 2 * ( a * b + c * d ), \
-    #                        a**2 - b**2 - c**2 + d**2 );
-    #         psy = arctan2( 2 * ( a * d + b * c ), \
-    #                        a**2 + b**2 - c**2 - d**2 );
-    #     #
-    #     return phi, theta, psy;
-    # #
-    #######################################################
-
     def normalize( self, v ):
         return v / sqrt( dot( v, v ) );
     #
@@ -175,12 +123,18 @@ class sensor ( Thread ):
         g_acc = array( self.acc.get_acc(  ) );
         dg    = cross( self.g, w_gyr );
 
-        if abs( sqrt( dot( g_acc, g_acc ) ) - 1. ) > \
-           self.d_gravity_threashold:
-            kalman.y_innov_modulate = 0.;
+        is_to_suppress_acc \
+            = abs( sqrt( dot( g_acc, g_acc ) ) - 1. ) > \
+              self.d_gravity_threashold;
         #
         
         for i in range( 3 ):
+            if is_to_suppress_acc:
+                self.kalman[ i ].y_innov_modulate = 0.;
+                print 'Suppressed acc';
+            else:
+                self.kalman[ i ].y_innov_modulate = 1.;
+            #
             res = self.kalman[ i ] \
                   ( dg[ i ], g_acc[ i ], self.dt );
             if not isnan( res ):
@@ -219,11 +173,12 @@ class sensor ( Thread ):
             hdg += 2 * pi;
         #
         return hdg * self.rad_to_deg;        
-    #
-                
+    #                
         
     def get_val( self ):
-        g_yz  =    sqrt( self.g[ 1 ]**2 + self.g[ 2 ]**2 );
+        self.time = time.time(  ) % 1000;
+        
+        g_yz  =   sqrt( self.g[ 1 ]**2 + self.g[ 2 ]**2 );
         theta =   arctan2( self.g[ 0 ], g_yz        );
         phi   = - arctan2( self.g[ 1 ], self.g[ 2 ] );
 
@@ -232,19 +187,13 @@ class sensor ( Thread ):
         
         self.hdg      = self.get_hdg( theta, phi );
         self.gs       = self.gps.gs;
-        self.altitude = self.gps.altitude;
+        self.gps_trk = self.gps.trkt;
+        self.gps_alti = self.gps.altitude;
 
-        # V/S calculation
-        dt              = time.time(  ) - self.alti_old_t;
-        da              = self.altitude - self.alti_old;
-        self.vs         = da / dt;
-        self.alti_old   = self.altitude;
-        self.alti_old_t = time.time(  );
+        self.baro = self.bar.get_baro(  );
+        self.temp = self.bar.get_temp(  );
+        self.alti = self.gps_alti;
 
-        # Fake values; need more corrections.
-        self.trk  = self.gps.trkt;
-        self.kias = self.gs;
-        #
         return;
     #
         
@@ -269,25 +218,24 @@ class sensor ( Thread ):
     #
 #
 
-def f_report( pitch, bank, kias, alti,
-              vs, hdg, trk, gs ):
-    return 'AUG:0.,' + \
-        'PIT:%g,' % pitch + \
-        'BAN:%g,' % bank  + \
-        'IAS:%g,' % kias  + \
-        'ALT:%g,' % alti  + \
-        'VSP:%g,' % vs    + \
-        'HDG:%g,' % hdg   + \
-        'TRK:%g,' % trk   + \
-        'GSP:%g,' % gs    + \
-        'UAG:0.';
+    def report( self ):
+        return 'AUG:0.,' +               \
+            'TIM:%g,' % self.time      + \
+            'PIT:%g,' % self.pitch     + \
+            'BAN:%g,' % self.bank      + \
+            'BAR:%g,' % self.baro      + \
+            'TMP:%g,' % self.temp      + \
+            'HDG:%g,' % self.hdg       + \
+            'GAL:%g,' % self.gps_alti  + \
+            'GTR:%g,' % self.gps_trk   + \
+            'GSP:%g,' % self.gs        + \
+            'UAG:0.';
     #
 #
     
 if __name__=='__main__':
     s = sensor(  );
     s.start(  );
-    # s.run(  );
 
     try:
         while( True ):
@@ -296,9 +244,7 @@ if __name__=='__main__':
                 continue;
             #
             s.get_val(  );
-            report = f_report\
-                 ( s.pitch, s.bank, s.kias, s.altitude,
-                   s.vs, s.hdg, s.trk, s.gs );
+            report = s.report(  );
             print report;
     #
     except KeyboardInterrupt:
