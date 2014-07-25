@@ -20,6 +20,7 @@ public class SetAltimeter extends Activity
     @Override
     public void onCreate( Bundle savedInstanceState )
     {
+        Log.i( "BTHUD", "SetAltimeter started." );
         super.onCreate(savedInstanceState);
         setContentView( R.layout.set_altimeter );
         text_alti_slp = ( TextView )

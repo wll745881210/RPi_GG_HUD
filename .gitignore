@@ -79,6 +79,7 @@ target/
 *.apk
 out/
 gen/
+.idea/
 
 # Temp files
 \#*
