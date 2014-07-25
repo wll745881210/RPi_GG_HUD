@@ -76,6 +76,8 @@ target/
 *.exe
 *.out
 *.app
+*.apk
+out/
 
 # Temp files
 \#*
