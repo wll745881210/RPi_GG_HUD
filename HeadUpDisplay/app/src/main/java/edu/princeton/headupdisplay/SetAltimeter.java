@@ -28,11 +28,9 @@ public class SetAltimeter extends Activity
         text_field_alti = ( TextView )
                 findViewById( R.id.field_alti );
 
-        Bundle alti_info = this.getIntent().getExtras();
-        slp = alti_info.getFloat( "slp" );
-        bar = alti_info.getFloat( "bar" );
-        tmp = alti_info.getFloat( "tmp" );
-
+        slp = this.getIntent().getFloatExtra( "slp", 29.92f );
+        bar = this.getIntent().getFloatExtra( "bar", 29.92f );
+        tmp = this.getIntent().getFloatExtra( "tmp", 25.00f );
         show_data();
 
         gesture = create_gesture(this);
@@ -46,9 +44,7 @@ public class SetAltimeter extends Activity
         {
             case KeyEvent.KEYCODE_DPAD_CENTER:
                 Intent ret_slp = new Intent(  );
-                Bundle alti_info = new Bundle(  );
-                alti_info.putFloat( "slp", slp );
-                ret_slp.putExtras( alti_info );
+                ret_slp.putExtra( "slp", slp );
                 setResult( HUD_Display.request_code_set_alti,
                         ret_slp );
             case KeyEvent.KEYCODE_BACK:
@@ -89,11 +85,13 @@ public class SetAltimeter extends Activity
             @Override
             public boolean onScroll( float x, float dx, float v )
             {
-                if( slp < 31.00 && slp > 28.00 )
-                {
-                    slp += 0.3 * dx;
-                    show_data(  );
-                }
+                slp += 5e-4 * dx;
+                if( slp > 31.00f )
+                    slp = 31.00f;
+                else if( slp < 28.00f )
+                    slp = 28.00f;
+
+                show_data(  );
                 return false;
             }
         };

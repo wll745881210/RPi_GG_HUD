@@ -55,6 +55,20 @@ public class HUD_Display extends Activity
         return true;
     }
 
+    private void start_set_altimeter(  )
+    {
+        Intent set_alti = new Intent(  );
+        set_alti.setClass( HUD_Display.this,
+                SetAltimeter.class );
+
+        set_alti.putExtra( "slp", data_map.get( "SLP" ) );
+        set_alti.putExtra( "bar", data_map.get( "BAR" ) );
+        set_alti.putExtra( "tmp", data_map.get( "TMP" ) );
+
+        startActivityForResult( set_alti,
+                request_code_set_alti );
+    }
+
     public static final int request_code_set_alti = 2992;
     @Override
     public boolean onOptionsItemSelected( MenuItem item )
@@ -66,21 +80,7 @@ public class HUD_Display extends Activity
                 data_process.toggle_gps_alti(  );
                 break;
             case menu_set_alti:
-                Intent set_alti = new Intent(  );
-                set_alti.setClass( HUD_Display.this,
-                        SetAltimeter.class );
-
-                Bundle alti_info = new Bundle(  );
-                alti_info.putFloat( "slp",
-                        data_map.get( "SLP" ) );
-                alti_info.putFloat( "bar",
-                        data_map.get( "BAR" ) );
-                alti_info.putFloat( "tmp",
-                        data_map.get( "TMP" ) );
-                set_alti.putExtras( alti_info );
-
-                startActivityForResult( set_alti,
-                        request_code_set_alti );
+                start_set_altimeter();
                 break;
         }
         return true;
@@ -109,8 +109,8 @@ public class HUD_Display extends Activity
         switch( requestCode )
         {
             case request_code_set_alti:
-                Bundle alti_info = intent.getExtras();
-                float slp = alti_info.getFloat( "slp" );
+                float slp = intent.getFloatExtra( "slp",
+                        data_map.get( "SLP" ) );
                 data_map.put( "SLP", slp );
                 break;
         }
