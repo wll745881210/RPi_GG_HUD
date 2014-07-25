@@ -38,6 +38,8 @@ public class HUD_Display extends Activity
         bluetooth_recv =
                 new BluetoothReceiver( bt_broadcaster );
         bluetooth_recv.start();
+
+        data_map_set_default(  );
     }
 
     private static final int menu_toggle_gps_alt =
@@ -109,8 +111,8 @@ public class HUD_Display extends Activity
         switch( requestCode )
         {
             case request_code_set_alti:
-                float slp = intent.getFloatExtra( "slp",
-                        data_map.get( "SLP" ) );
+                Bundle alti_info = intent.getExtras();
+                float slp = alti_info.getFloat( "slp" );
                 data_map.put( "SLP", slp );
                 break;
         }
@@ -118,18 +120,18 @@ public class HUD_Display extends Activity
 
     private Map<String, Float> data_map
             = new HashMap<String, Float>(  );
+    private void data_map_set_default(  )
+    {
+        data_map.put( "VSP", 0.f );
+        data_map.put( "SLP", 29.92f );
+    }
+
     private DataProcess data_process
             = new DataProcess(  );
     private void process_plot(  )
     {
-        data_map.put( "IAS", 120.f );
-        data_map.put( "ALT", 7500.f );
-        data_map.put( "TRK", 250f );
-        data_map.put( "SLP", 29.92f );
-        data_map.put( "VSP", 1200f );
-        data_map.put( "BAR", 29.92f );
-        data_map.put( "PIT", 7f );
-        data_map.put( "BAN", -8f );
+        data_process.set_data_map( this.data_map );
+        data_process.set_all();
         draw_all.plot( data_map );
     }
 

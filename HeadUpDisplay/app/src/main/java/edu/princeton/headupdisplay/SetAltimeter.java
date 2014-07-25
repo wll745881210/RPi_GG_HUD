@@ -9,7 +9,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-import com.google.android.glass.touchpad.Gesture;
 import com.google.android.glass.touchpad.GestureDetector;
 
 public class SetAltimeter extends Activity
@@ -17,6 +16,8 @@ public class SetAltimeter extends Activity
     TextView text_alti_slp   = null;
     TextView text_field_alti = null;
     private GestureDetector gesture = null;
+    private final float m_to_ft = 3.28f;
+    private final float hpa_to_inHg = 0.0295333727f;
     @Override
     public void onCreate( Bundle savedInstanceState )
     {
@@ -29,43 +30,38 @@ public class SetAltimeter extends Activity
                 findViewById( R.id.field_alti );
 
         slp = this.getIntent().getFloatExtra( "slp", 29.92f );
-        bar = this.getIntent().getFloatExtra( "bar", 29.92f );
         tmp = this.getIntent().getFloatExtra( "tmp", 25.00f );
+        bar = this.getIntent().getFloatExtra( "bar", 1013.25f )
+                * hpa_to_inHg;
+
+        slp_original = slp;
         show_data();
 
         gesture = create_gesture(this);
     }
 
-    private float slp, bar, tmp, field_alti;
+    private float slp, bar, tmp, field_alti, slp_original;
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
     {
-        switch( keyCode )
-        {
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-                Intent ret_slp = new Intent(  );
-                ret_slp.putExtra( "slp", slp );
-                setResult( HUD_Display.request_code_set_alti,
-                        ret_slp );
-            case KeyEvent.KEYCODE_BACK:
-                finish(  );
-        }
+        Intent ret_slp = new Intent(  );
+        if( keyCode == KeyEvent.KEYCODE_DPAD_CENTER )
+            ret_slp.putExtra( "slp", slp );
+        else if( keyCode == KeyEvent.KEYCODE_BACK )
+            ret_slp.putExtra( "slp", slp_original );
+        setResult( HUD_Display.request_code_set_alti, ret_slp );
+        finish(  );
         return false;
     }
 
-    private void get_alti(  )
+    public static float get_alti( float bar, float slp )
     {
-        float alt_std  = ( 1.f - ( float )
-                Math.pow( bar / 29.92, -5.256 ) ) / 6.876e-6f;
-        float alt_corr = 145442.2f *
-                ( 1.f - ( float )
-                        Math.pow( slp / 29.92, 0.190261 ) );
-        field_alti = alt_std - alt_corr;
+        return ( slp - bar ) * 1000.f;
     }
 
     private void show_data(  )
     {
-        get_alti(  );
+        field_alti = get_alti( bar, slp );
         String slp_str =
                 String.format( "Altimeter: %02.2f", slp );
         String field_alti_str =
@@ -85,7 +81,7 @@ public class SetAltimeter extends Activity
             @Override
             public boolean onScroll( float x, float dx, float v )
             {
-                slp += 5e-4 * dx;
+                slp += 2e-4 * dx;
                 if( slp > 31.00f )
                     slp = 31.00f;
                 else if( slp < 28.00f )

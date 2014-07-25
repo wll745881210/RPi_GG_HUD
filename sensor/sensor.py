@@ -176,7 +176,7 @@ class sensor ( Thread ):
     #                
         
     def get_val( self ):
-        self.time = time.time(  ) % 1000;
+        self.time = time.time(  ) % 10;
         
         g_yz  =   sqrt( self.g[ 1 ]**2 + self.g[ 2 ]**2 );
         theta =   arctan2( self.g[ 0 ], g_yz        );
@@ -187,10 +187,14 @@ class sensor ( Thread ):
         
         self.hdg      = self.get_hdg( theta, phi );
         self.gs       = self.gps.gs;
-        self.gps_trk = self.gps.trkt;
         self.gps_alti = self.gps.altitude;
+        #####################################
+        # Warning: should convert to TRK(Mag)
+        ############
+        self.gps_trk  = self.gps.trkt;
+        #####################################
 
-        self.baro = self.bar.get_baro(  );
+        self.baro = self.bar.get_baro(  ) - 5.;
         self.temp = self.bar.get_temp(  );
         self.alti = self.gps_alti;
 

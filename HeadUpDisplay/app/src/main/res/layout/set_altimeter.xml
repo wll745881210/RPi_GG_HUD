@@ -4,18 +4,22 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:keepScreenOn="true"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android 
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:gravity="center"
         android:text=""
         android:id="@+id/alti_slp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:gravity="center"
         android:text=""
         android:id="@+id/field_alti" />
 </LinearLayout>

@@ -14,7 +14,7 @@ public class DrawHDGTRKVSPSLP
 
     private int hdg, trk, vsp;
     private float slp;
-    public void set_hdg_trk_vsp_slp
+    public void set_all
             ( float hdg, float trk, float vsp, float slp )
     {
         this.hdg = ( int ) hdg;
@@ -31,24 +31,30 @@ public class DrawHDGTRKVSPSLP
                 x_center, y_base - 1.2f * frame_height,
                 paint );
 
-
         paint.setTextAlign( Paint.Align.LEFT );
         String trk_str = String.format( "TRK %03d", trk );
         canvas.drawText( trk_str, 10,
                 y_base, paint );
 
         paint.setTextAlign( Paint.Align.RIGHT );
-        String vsp_str = String.format( "V/S  %d", vsp );
+        String vsp_str = String.format( "%4d", vsp );
         if( vsp > 0 )
             vsp_str = "+" + vsp_str;
-        canvas.drawText( vsp_str, canvas_width - 10,
-                y_base, paint );
+        canvas.drawText( "V/S  " + vsp_str,
+                canvas_width - 10, y_base, paint );
 
         y_base = y_center - dy_frame_center + 20;
         paint.setTextAlign( Paint.Align.RIGHT );
-        String slp_str = String.format( "ALTI %02.2f", slp );
+        String slp_str;
+        final boolean is_gps_alt
+                = DataProcess.get_gps_alti_status();
+        if( is_gps_alt )
+            slp_str = "GPS ALTI";
+        else
+            slp_str = String.format( "ALTI %02.2f", slp );
         canvas.drawText( slp_str, canvas_width - 10,
-                y_base, paint );
+                    y_base, paint );
+
     }
 
     private float frame_height, frame_width;

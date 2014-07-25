@@ -12,10 +12,10 @@ public class DrawSpeedAltitude
         this.holder = holder;
     }
 
-    private float kias, altitude;
-    public void set_speed_altitude( float kias, float altitude )
+    private float gs, altitude;
+    public void set_speed_altitude( float gs, float altitude )
     {
-        this.kias = kias;
+        this.gs = gs;
         this.altitude = altitude;
     }
 
@@ -138,11 +138,11 @@ public class DrawSpeedAltitude
         this.paint = paint;
 
         plot_frame();
-        float kias_spacing_const = 7.f;
-        int   kias_d_value = 5;
-        int   kias_dn_tick = 2;
-        plot_ruler( -1, kias_spacing_const, ( int ) kias,
-                kias_d_value, kias_dn_tick );
+        float gs_spacing_const = 7.f;
+        int   gs_d_value = 5;
+        int   gs_dn_tick = 2;
+        plot_ruler( -1, gs_spacing_const, ( int ) gs,
+                gs_d_value, gs_dn_tick );
 
         float alti_spacing_const = .7f;
         int   alti_d_value = 50;

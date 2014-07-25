@@ -46,6 +46,9 @@ public class DrawAll extends SurfaceView
     public void plot( Map<String, Float> data )
     {
         Canvas canvas = holder.lockCanvas(  );
+        if( canvas == null )
+            return;
+
         canvas.drawColor( Color.BLACK );
         Paint  paint  = new Paint(  );
 
@@ -64,11 +67,11 @@ public class DrawAll extends SurfaceView
         draw_attitude.draw_attitude( canvas, paint );
 
         draw_speed_altitude.set_speed_altitude
-                ( data.get( "IAS" ), data.get( "ALT" ) );
+                ( data.get( "GSP" ), data.get( "ALT" ) );
         draw_speed_altitude.draw_speed_altitude( canvas, paint );
 
-        draw_hdg_trk_vsp_slp.set_hdg_trk_vsp_slp
-                ( data.get( "HDG" ), data.get( "TRK" ),
+        draw_hdg_trk_vsp_slp.set_all
+                ( data.get( "HDG" ), data.get( "GTR" ),
                   data.get( "VSP" ), data.get( "SLP" ) );
         draw_hdg_trk_vsp_slp.draw_hdg( canvas, paint );
 
