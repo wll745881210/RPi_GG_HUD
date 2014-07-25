@@ -63,9 +63,9 @@ public class SetAltimeter extends Activity
     {
         field_alti = get_alti( bar, slp );
         String slp_str =
-                String.format( "Altimeter: %02.2f", slp );
+                String.format( "Altimeter: %02.2f inHg", slp );
         String field_alti_str =
-                String.format( "Field Altitude: %02.0f",
+                String.format( "Field Altitude: %02.0f ft",
                         field_alti );
         text_alti_slp.setText(slp_str);
         text_field_alti.setText( field_alti_str );

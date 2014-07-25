@@ -62,6 +62,9 @@ public class DataProcess
 
         int vs = ( int ) ( dalt / dt );
         vs = 10 * ( int ) ( vs / 10 );
+        if( Math.abs( vs ) < 50 )
+            vs = 0;
+
         data_map.put( "VSP", ( float ) vs );
         alt_old = alt_new;
         t_old = t_new;

@@ -57,7 +57,8 @@ public class DrawAll extends SurfaceView
         paint.setTextSize( original_text_size * scale );
 
         if( Math.abs( data.get( "BAN" ) ) > 45 ||
-                Math.abs( data.get( "PIT" )  ) > 30 )
+                Math.abs( data.get( "PIT" ) ) > 30 ||
+                Math.abs( data.get( "VSP" ) ) > 1500 )
             paint.setColor( Color.RED );
         else
             paint.setColor( Color.GREEN );
