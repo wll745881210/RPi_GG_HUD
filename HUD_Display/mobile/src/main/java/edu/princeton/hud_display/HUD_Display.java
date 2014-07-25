@@ -1,6 +1,7 @@
 package edu.princeton.hud_display;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,6 +44,7 @@ public class HUD_Display extends Activity
             Menu.FIRST;
     private static final int menu_set_alti =
             Menu.FIRST + 1;
+    @Override
     public boolean onCreateOptionsMenu( Menu menu )
     {
         super.onCreateOptionsMenu( menu );
@@ -53,6 +55,7 @@ public class HUD_Display extends Activity
         return true;
     }
 
+    public static final int request_code_set_alti = 2992;
     @Override
     public boolean onOptionsItemSelected( MenuItem item )
     {
@@ -63,7 +66,21 @@ public class HUD_Display extends Activity
                 data_process.toggle_gps_alti(  );
                 break;
             case menu_set_alti:
-                data_process.set_sea_level_pressue( 29.92f );
+                Intent set_alti = new Intent(  );
+                set_alti.setClass( HUD_Display.this,
+                        SetAltimeter.class );
+
+                Bundle alti_info = new Bundle(  );
+                alti_info.putFloat( "slp",
+                        data_map.get( "SLP" ) );
+                alti_info.putFloat( "bar",
+                        data_map.get( "BAR" ) );
+                alti_info.putFloat( "tmp",
+                        data_map.get( "TMP" ) );
+                set_alti.putExtras( alti_info );
+
+                startActivityForResult( set_alti,
+                        request_code_set_alti );
                 break;
         }
         return true;
@@ -84,6 +101,20 @@ public class HUD_Display extends Activity
         return false;
     }
 
+    @Override
+    protected void onActivityResult
+            ( int requestCode, int resultCode,
+              Intent intent )
+    {
+        switch( requestCode )
+        {
+            case request_code_set_alti:
+                Bundle alti_info = intent.getExtras();
+                float slp = alti_info.getFloat( "slp" );
+                data_map.put( "SLP", slp );
+                break;
+        }
+    }
 
     private Map<String, Float> data_map
             = new HashMap<String, Float>(  );
@@ -96,7 +127,7 @@ public class HUD_Display extends Activity
         data_map.put( "TRK", 250f );
         data_map.put( "SLP", 29.92f );
         data_map.put( "VSP", 1200f );
-        data_map.put( "BAR", 1013.f );
+        data_map.put( "BAR", 29.92f );
         data_map.put( "PIT", 7f );
         data_map.put( "BAN", -8f );
         draw_all.plot( data_map );

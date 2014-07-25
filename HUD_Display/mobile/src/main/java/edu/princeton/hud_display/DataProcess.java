@@ -21,13 +21,4 @@ public class DataProcess
         return is_using_gps_alti;
     }
 
-    private float sea_level_pressue = 29.92f;
-    public void set_sea_level_pressue
-            ( float sea_level_pressue )
-    {
-        this.sea_level_pressue = sea_level_pressue;
-        Log.i( "BTHUD", "Set sea level pressure "
-                + Float.toString( sea_level_pressue ) );
-    }
-
 }

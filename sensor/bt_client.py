@@ -17,20 +17,6 @@ port = svc_dicts[ 0 ][ 'port' ];
 
 sock.connect( ( hostaddr, port ) );
 
-def f_report( pitch, bank, kias, alti,
-              vs, hdg, trk, gs ):
-    return 'AUG:0.,' + \
-        'PIT:%g,' % pitch + \
-        'BAN:%g,' % bank  + \
-        'IAS:%g,' % kias  + \
-        'ALT:%g,' % alti  + \
-        'VSP:%g,' % vs    + \
-        'HDG:%g,' % hdg   + \
-        'TRK:%g,' % trk   + \
-        'GSP:%g,' % gs    + \
-        'UAG:0.';
-#
-
 s = sensor(  );
 s.start(  );
 

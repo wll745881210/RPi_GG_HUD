@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/mobile/src/androidTest/androidTest.iml" filepath="$PROJECT_DIR$/HUD_Display/mobile/src/androidTest/androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/glass/build/generated/source/buildConfig/buildConfig.iml" filepath="$PROJECT_DIR$/HUD_Display/glass/build/generated/source/buildConfig/buildConfig.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/mobile/build/generated/source/buildConfig/buildConfig1.iml" filepath="$PROJECT_DIR$/HUD_Display/mobile/build/generated/source/buildConfig/buildConfig1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/glass/build/intermediates/manifests/debug/debug.iml" filepath="$PROJECT_DIR$/HUD_Display/glass/build/intermediates/manifests/debug/debug.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/mobile/build/intermediates/manifests/debug/debug.iml" filepath="$PROJECT_DIR$/HUD_Display/mobile/build/intermediates/manifests/debug/debug.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/mobile/src/main/main.iml" filepath="$PROJECT_DIR$/HUD_Display/mobile/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/glass/src/main/main.iml" filepath="$PROJECT_DIR$/HUD_Display/glass/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/glass/src/androidTest/java/edu/princeton/princeton.iml" filepath="$PROJECT_DIR$/HUD_Display/glass/src/androidTest/java/edu/princeton/princeton.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/glass/build/generated/source/r/r.iml" filepath="$PROJECT_DIR$/HUD_Display/glass/build/generated/source/r/r.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HUD_Display/mobile/build/generated/source/r/r1.iml" filepath="$PROJECT_DIR$/HUD_Display/mobile/build/generated/source/r/r1.iml" />
+    </modules>
+  </component>
+</project>
+
