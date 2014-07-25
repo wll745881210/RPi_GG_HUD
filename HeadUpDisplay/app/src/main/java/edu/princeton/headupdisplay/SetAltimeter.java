@@ -57,6 +57,8 @@ public class SetAltimeter extends Activity
     public static float get_alti( float bar, float slp )
     {
         return ( slp - bar ) * 1000.f;
+//        Well, I know better formulae, yet Cessna 172
+//        is using this crappy one on its altimeter!
     }
 
     private void show_data(  )
