@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
-from lsm303d   import lsm303d
-from lps25h    import lps25h
-from l3gd20h   import l3gd20h
-from ls20031   import ls20031
-from kalman    import kalman
-from numpy     import *
-from threading import Thread
+from lsm303d             import lsm303d
+from lps25h              import lps25h
+from l3gd20h             import l3gd20h
+from ls20031             import ls20031
+from kalman              import kalman
+from numpy               import *
+from threading           import Thread
+from numpy.linalg.linalg import norm
 
 import time
 import pdb
@@ -32,10 +33,13 @@ class sensor ( Thread ):
 
         ################################################
         # Kalman filter and temporal integration of gyro
-        #################
-        self.dt     = 0.;
-        self.g      = zeros( 3 ); # Grav vector
-        self.kalman = [ kalman( ) for _ in range( 3 ) ];
+        ##################
+        self.dt      = 0.;
+        self.g       = zeros( 3 ); # Grav vector
+        self.g0      = zeros( 3 ); # Initial grav vector
+        self.Rtheta0 = 0.;
+        self.Rphi0   = 0.;
+        self.kalman  = [ kalman( ) for _ in range( 3 ) ];
         #################
         self.d_gravity_threashold = 0.02;
         # In case that the deviation of the magnitude
@@ -74,10 +78,8 @@ class sensor ( Thread ):
         i = 0;
         acc_dx = acc_dy = acc_dz = 0.;
         gyr_dx = gyr_dy = gyr_dz = 0.;
-        self.gps_base_altitude = 0.;
 
         start_t = time.time(  );
-
         while( time.time(  ) - start_t < dt ):
             i += 1;
             acc_x, acc_y, acc_z = self.acc.get_acc(  );
@@ -88,33 +90,52 @@ class sensor ( Thread ):
             gyr_dx += gyr_x;
             gyr_dy += gyr_y;
             gyr_dz += gyr_z;
-
-            self.gps_base_altitude += self.gps.altitude;
         #
 
         self.acc.acc_dx = acc_dx / i;
         self.acc.acc_dy = acc_dy / i;
-        if acc_dz > 0:
-            self.acc.acc_dz = acc_dz / i - 1.;
-            self.g[ 2 ]     = +1.;
-        else:
-            self.acc.acc_dz = acc_dz / i + 1.;
-            self.g[ 2 ]     = -1.;
-        #
+        self.acc.acc_dz = acc_dz / i - 1.;
+        self.g [ 2 ]    = 1.;
+        self.g0[ 2 ]    = 1.;
             
         self.gyr.gyr_dx += gyr_dx / i;
         self.gyr.gyr_dy += gyr_dy / i;
         self.gyr.gyr_dz += gyr_dz / i;
 
-        self.gps_base_altitude /= i;
-
         print "Calibration finished.";
+
+        res_acc = array( [ self.acc.acc_dx, \
+                           self.acc.acc_dy, \
+                           self.acc.acc_dz ] );
+        res_gyr = array( [ self.gyr.gyr_dx, \
+                           self.gyr.gyr_dy, \
+                           self.gyr.gyr_dz ] );
+        res     = column_stack( ( res_acc, res_gyr ) );
+        savetxt( 'calib.txt', res );
+        
         self.is_calibrated = True;
         return;
     #
 
+    def load_calib( self ):
+        data = loadtxt( 'calib.txt' );
+        self.acc.acc_dx, self.acc.acc_dy, self.acc.acc_dx \
+            = data[ :, 0 ];
+        self.gyr.gyr_dx, self.gyr.gyr_dy, self.gyr.gyr_dx \
+            = data[ :, 1 ];
+
+        self.g       = array( self.acc.get_acc(  ) );
+        self.g0      = copy( self.g );
+        self.g0_norm = norm( self.g );
+        
+        theta0, phi0 = self.rot_angle( self.g0 );
+        self.Rtheta0, self.Rphi0 \
+            = self.rot_matrix( theta0, phi0 );
+        return;
+    #        
+
     def normalize( self, v ):
-        return v / sqrt( dot( v, v ) );
+        return v / norm( v );
     #
 
     def integrate_gyro( self ):
@@ -123,9 +144,9 @@ class sensor ( Thread ):
         g_acc = array( self.acc.get_acc(  ) );
         dg    = cross( self.g, w_gyr );
 
-        is_to_suppress_acc \
-            = abs( sqrt( dot( g_acc, g_acc ) ) - 1. ) > \
-              self.d_gravity_threashold;
+        is_to_suppress_acc                 \
+            = norm( g_acc ) - self.g0_norm \
+            > self.d_gravity_threashold;
         #
         
         for i in range( 3 ):
@@ -146,7 +167,18 @@ class sensor ( Thread ):
         return;
     #
 
-    def get_hdg( self, theta, phi ):
+    def convert_g( self, g ):
+        return self.Rtheta0 * self.Rphi0 * matrix( g ).T;
+    #
+
+    def rot_angle( self, g ):
+        g_yz  =   sqrt( g[ 1 ]**2 + g[ 2 ]**2 );
+        theta =   arctan2( g[ 0 ], g_yz   );
+        phi   = - arctan2( g[ 1 ], g[ 2 ] );
+        return theta, phi;
+    #        
+        
+    def rot_matrix( self, theta, phi ):
         cphi           = cos( phi   );
         sphi           = sin( phi   );
         ctheta         = cos( theta );
@@ -163,9 +195,14 @@ class sensor ( Thread ):
         Rtheta[ 2, 2 ] =   ctheta;
         Rtheta[ 0, 2 ] = - stheta;
         Rtheta[ 2, 0 ] =   stheta;
-        
-        b   = matrix( self.acc.get_mag(  ) ).T;
-        b   = Rtheta * Rphi * b;
+
+        return Rtheta, Rphi;
+    #
+
+    def get_hdg( self, Rtheta, Rphi ):
+        b = matrix( self.acc.get_mag(  ) ).T;
+        b = self.Rtheta0 * self.Rphi0 * Rtheta * Rphi * b;
+        #
         bx  = b[ 0, 0 ];
         by  = b[ 1, 0 ];
         hdg = arctan2( by, bx );
@@ -177,15 +214,15 @@ class sensor ( Thread ):
         
     def get_val( self ):
         self.time = time.time(  ) % 10;
-        
-        g_yz  =   sqrt( self.g[ 1 ]**2 + self.g[ 2 ]**2 );
-        theta =   arctan2( self.g[ 0 ], g_yz        );
-        phi   = - arctan2( self.g[ 1 ], self.g[ 2 ] );
+
+        g_conv       = self.convert_g( self.g );
+        theta, phi   = self.rot_angle( g_conv );
+        Rtheta, Rphi = self.rot_matrix( theta, phi );
 
         self.pitch = theta * self.rad_to_deg;
         self.bank  = phi   * self.rad_to_deg;
         
-        self.hdg      = self.get_hdg( theta, phi );
+        self.hdg      = self.get_hdg( Rtheta, Rphi );
         self.gs       = self.gps.gs;
         self.gps_alti = self.gps.altitude;
         #####################################
@@ -202,7 +239,7 @@ class sensor ( Thread ):
     #
         
     def run( self ):
-        self.calib( 1 );
+        self.load_calib(  );
 
         new_time = time.time(  );
         while( True ):
@@ -244,12 +281,9 @@ if __name__=='__main__':
     try:
         while( True ):
             time.sleep( 0.2 );
-            if not s.is_calibrated:
-                continue;
-            #
             s.get_val(  );
-            report = s.report(  );
-            print report;
+            print s.report(  );
+        #
     #
     except KeyboardInterrupt:
         s.kill(  );

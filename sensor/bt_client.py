@@ -32,7 +32,7 @@ try:
         sock.send( report );
     #
 except:
-    s.kill;
+    s.kill(  );
 #
 
 s.kill(  );
