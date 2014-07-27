@@ -18,6 +18,7 @@ class sensor ( Thread ):
 
     def __init__( self ):
         Thread.__init__( self );
+        self.time_start = time.time(  );
 
         ################################################
         # Sensors
@@ -28,7 +29,7 @@ class sensor ( Thread ):
         self.gyr = l3gd20h(  );
         #######################
         self.gyr.set_sample_rate(  );
-        # self.gps.start(  );
+        self.gps.start(  );
         ################################################
 
         ################################################
@@ -69,6 +70,30 @@ class sensor ( Thread ):
         self.is_to_break   = False;
         ################################################
 
+        return;
+    #
+
+    def calib_gyro( self, dt = 10 ):
+        print "Calibrating gyroscope..."
+
+        i = 0;
+        gyr_dx = gyr_dy = gyr_dz = 0.;
+
+        start_t = time.time(  );
+        while( time.time(  ) - start_t < dt ):
+            i += 1;
+            gyr_x, gyr_y, gyr_z = self.gyr.get_gyr(  );
+            gyr_dx += gyr_x;
+            gyr_dy += gyr_y;
+            gyr_dz += gyr_z;
+        #
+
+        self.gyr.gyr_dx += gyr_dx / i;
+        self.gyr.gyr_dy += gyr_dy / i;
+        self.gyr.gyr_dz += gyr_dz / i;
+
+        print "Calibration finished.";
+        self.is_calibrated = True;
         return;
     #
 
@@ -129,6 +154,8 @@ class sensor ( Thread ):
         self.g0_norm = norm( self.g );
         
         theta0, phi0 = self.rot_angle( self.g0 );
+        print theta0 * self.rad_to_deg, \
+            phi0 * self.rad_to_deg ;
         self.Rtheta0, self.Rphi0 \
             = self.rot_matrix( theta0, phi0 );
         return;
@@ -213,7 +240,7 @@ class sensor ( Thread ):
     #                
         
     def get_val( self ):
-        self.time = time.time(  ) % 10;
+        self.time = time.time(  ) - self.time_start;
 
         g_conv       = self.convert_g( self.g );
         theta, phi   = self.rot_angle( g_conv );
@@ -240,7 +267,6 @@ class sensor ( Thread ):
         
     def run( self ):
         self.load_calib(  );
-
         new_time = time.time(  );
         while( True ):
             old_time = new_time;
@@ -254,8 +280,8 @@ class sensor ( Thread ):
     #
 
     def kill( self ):
-        self.is_to_break     = True;
-        self.gps.is_to_break = True;
+        self.gps.kill(  );
+        self.is_to_break  = True;
     #
 #
 
