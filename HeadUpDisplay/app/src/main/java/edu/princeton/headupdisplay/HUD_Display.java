@@ -99,6 +99,7 @@ public class HUD_Display extends Activity
         else if( keyCode == KeyEvent.KEYCODE_BACK )
         {
             finish();
+            System.exit( 0 );
         }
         return false;
     }
