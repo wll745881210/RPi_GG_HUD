@@ -29,7 +29,6 @@ class sensor ( Thread ):
         self.gyr = l3gd20h(  );
         #######################
         self.gyr.set_sample_rate(  );
-        self.gps.start(  );
         ################################################
 
         ################################################
@@ -243,6 +242,7 @@ class sensor ( Thread ):
         
     def run( self ):
         self.load_calib(  );
+        self.gps.start(  );
         new_time = time.time(  );
         while( True ):
             old_time = new_time;

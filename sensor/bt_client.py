@@ -8,11 +8,15 @@ from threading  import Thread
 
 import pdb
 
-class bt_client:
+class bt_client ( Thread ):
 
     def __init__( self ):
+        Thread.__init__( self );
+
         self.send_dt = 0.1;
         self.is_to_break = False;
+        self.s = sensor(  );
+        self.sock = bt.BluetoothSocket( bt.RFCOMM );
         
         with open( 'bt_address.txt', 'r' ) as f:
             for line in f:
@@ -41,7 +45,7 @@ class bt_client:
     #
 
     def start_bt( self ):
-        self.sock = bt.BluetoothSocket( bt.RFCOMM );
+        print self.sock;
         svc_dicts = bt.find_service\
                     ( name = 'bthud', \
                       address = self.hostaddr );
@@ -51,14 +55,13 @@ class bt_client:
     #
 
     def run( self ):
-        self.s = sensor(  );
         self.s.start(  );
         try:
             while( True ):
                 sleep( self.send_dt );
                 self.s.get_val(  );
                 report = self.s.report(  );
-                print report;
+                # print report;
                 self.sock.send( report );
                 if( self.is_to_break ):
                     break;
@@ -73,8 +76,8 @@ class bt_client:
 
     def kill( self ):
         self.s.kill(  );
-        self.is_to_break = True;
         self.sock.close(  );
+        self.is_to_break = True;
     #
 #
 

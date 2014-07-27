@@ -65,7 +65,8 @@ class ls20031 ( Thread ):
                 self.__parse_rmc( line );
             #
         except:
-            print 'Warning: Incorrect GPS data'
+            pass;
+            # print 'Warning: Incorrect GPS data'
         #
         return;
     #
