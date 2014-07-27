@@ -6,11 +6,9 @@ from bt_client import bt_client
 from sensor import sensor
 import subprocess
 import time
-import os
+import pdb
 
 ############################################################
-
-indicator   = led( 24 );
 
 class button_start_stop ( button ):
     def __init__( self, gpio_num ):
@@ -21,7 +19,7 @@ class button_start_stop ( button ):
     #
 
     def short_press( self ):
-        if self.is_started:
+        if self.is_started or button.is_blocked:
             return;
         else:
             self.is_started = True;
@@ -29,18 +27,18 @@ class button_start_stop ( button ):
         try:
             self.bt_driver.start_bt(  );
             self.bt_driver.start(  );
-            indicator.set_ratio_period( 0.1 )
+            button.indicator.set_ratio_period( 0.1 )
         except:
             pass;
         #
             
-        self.is_blocked = False;
+        button.is_blocked = False;
     #
 
     def long_press( self ):
         try:
             self.bt_driver.kill(  );
-            indicator.set_ratio_period( 0.0 );
+            button.indicator.set_ratio_period( 0.0 );
         except:
             pass;
         #
@@ -49,8 +47,8 @@ class button_start_stop ( button ):
     #
 
     def ultra_long_press( self ):
-        self.is_blocked = False;
         print "Shutting down...";
+        button.indicator.set_ratio_period( 0.5, 3 );
         subprocess.call( [ 'sudo', 'shutdown', '-h', 'now' ] )
     #
     
@@ -64,44 +62,43 @@ class button_start_stop ( button ):
 class button_pair_calib ( button ):
     def __init__( self, gpio_num ):
         button.__init__( self, gpio_num );
-        self.is_blocked = False;
         self.is_to_exit = False;
         return;
     #
 
     def short_press( self ):
-        if self.is_blocked:
+        if button.is_blocked:
             return;
         else:
-            self.is_blocked = True;
+            button.is_blocked = True;
         #
         try:
-            indicator.set_ratio_period( 0.5 );
+            button.indicator.set_ratio_period( 0.5 );
             print "Going to paring";
             bt_driver = bt_client(  );
             print bt_driver.pair_device(  );
         except:
             pass;
         #
-        indicator.set_ratio_period( 0.0 );
-        self.is_blocked = False;
+        button.indicator.set_ratio_period( 0.0 );
+        button.is_blocked = False;
     #
 
     def long_press( self ):
-        if self.is_blocked:
+        if button.is_blocked:
             return;
         else:
-            self.is_blocked = True;
+            button.is_blocked = True;
         #
         try:
-            indicator.set_ratio_period( 1. );
+            button.indicator.set_ratio_period( 1. );
             s = sensor(  );
             s.calib(  );
         except:
             pass;
         #
-        indicator.set_ratio_period( 0.0 );
-        self.is_blocked = False;
+        button.indicator.set_ratio_period( 0.0 );
+        button.is_blocked = False;
     #
 
     def ultra_long_press( self ):
@@ -111,22 +108,25 @@ class button_pair_calib ( button ):
 #
 
 def main(  ):
+    print "HUD sensors started.";
+    button.indicator.set_ratio_period( 0.1, 3 );
     button1 = button_start_stop( 22 );
     button2 = button_pair_calib( 23 );
-    indicator.start(  );
+    button.indicator.start(  );
     button1.start(  );
     button2.start(  );
     try:
         while( True ):
             time.sleep( 1 );
             if button2.is_to_exit:
+                pdb.set_trace(  );
                 break;
             #
         #
     except ( bt.btcommon.BluetoothError, \
              KeyboardInterrupt ):
         button1.kill(  );
-        indicator.kill(  );
+        button.indicator.kill(  );
     #
 #
 
