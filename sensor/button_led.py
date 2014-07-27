@@ -8,6 +8,7 @@ from threading  import Thread
 
 class button ( Thread ):
     def __init__( self, gpio_num ):
+        Thread.__init__( self );
         self.n_gpio              = gpio_num;
         GPIO.setmode( GPIO.BCM );
         GPIO.setup( gpio_num, GPIO_IN, \
@@ -47,7 +48,7 @@ class led ( Thread ):
         GPIO.setmode( GPIO.BCM );
         GPIO.setup( gpio_num, GPIO.OUT );
         self.on          = 0.;
-        self.off         = 0.;
+        self.off         = 0.1;
         self.is_to_break = False;
     #
 
@@ -63,7 +64,7 @@ class led ( Thread ):
         #
     #
 
-    def set_period_ratio( self, period, ratio ):
+    def set_ratio_period( self, ratio, period = 1. ):
         self.on  = period * ratio;
         self.off = period * ( 1. - ratio );
     #

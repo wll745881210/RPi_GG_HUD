@@ -73,30 +73,6 @@ class sensor ( Thread ):
         return;
     #
 
-    def calib_gyro( self, dt = 10 ):
-        print "Calibrating gyroscope..."
-
-        i = 0;
-        gyr_dx = gyr_dy = gyr_dz = 0.;
-
-        start_t = time.time(  );
-        while( time.time(  ) - start_t < dt ):
-            i += 1;
-            gyr_x, gyr_y, gyr_z = self.gyr.get_gyr(  );
-            gyr_dx += gyr_x;
-            gyr_dy += gyr_y;
-            gyr_dz += gyr_z;
-        #
-
-        self.gyr.gyr_dx += gyr_dx / i;
-        self.gyr.gyr_dy += gyr_dy / i;
-        self.gyr.gyr_dz += gyr_dz / i;
-
-        print "Calibration finished.";
-        self.is_calibrated = True;
-        return;
-    #
-
     def calib( self, dt = 10 ):
         print "Calibrating accelerometer and gyroscope..."
 
